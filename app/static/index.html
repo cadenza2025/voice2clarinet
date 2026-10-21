@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173e35">
+  <meta name="description" content="Turn the vocal melody from a voice-and-piano PDF into a readable B-flat clarinet part. Private, local score recognition.">
+  <title>Reed &amp; Voice — A new part to play</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="masthead">
+    <a class="brand" href="/" aria-label="Reed and Voice home"><span class="brand-mark" aria-hidden="true">♮</span> reed <em>&amp;</em> voice<span class="brand-dot">.</span></a>
+    <span class="header-note">THE MELODY, REIMAGINED</span>
+    <a class="text-link" href="#how-it-works">How it works <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="tiny-rule"></span> FROM VOICE TO B♭ CLARINET</p>
+        <h1 id="hero-title">Your favorite melody.<br><em>A new part to play.</em></h1>
+        <p class="hero-description">Give your clarinet the singing line. Upload a voice-and-piano score, choose the vocal part, and make it your own.</p>
+        <div class="hero-details"><span>PDF in</span><span aria-hidden="true">→</span><span>Vocal line</span><span aria-hidden="true">→</span><strong>Clarinet score out</strong></div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="art-label">A LITTLE CHANGE IN PERSPECTIVE</div>
+        <svg viewBox="0 0 410 225" class="music-art">
+          <g class="staff"><path d="M25 65H380M25 77H380M25 89H380M25 101H380M25 113H380"/><path d="M25 151H380M25 163H380M25 175H380M25 187H380M25 199H380"/></g>
+          <text x="32" y="112" class="clef">𝄞</text><text x="32" y="199" class="clef">𝄞</text>
+          <g class="notes"><ellipse cx="109" cy="101" rx="9" ry="6" transform="rotate(-22 109 101)"/><path d="M117 99V58"/><ellipse cx="171" cy="89" rx="9" ry="6" transform="rotate(-22 171 89)"/><path d="M179 87V46"/><ellipse cx="235" cy="77" rx="9" ry="6" transform="rotate(-22 235 77)"/><path d="M243 75V34"/><ellipse cx="299" cy="89" rx="9" ry="6" transform="rotate(-22 299 89)"/><path d="M307 87V46"/>
+          <ellipse cx="109" cy="181" rx="9" ry="6" transform="rotate(-22 109 181)"/><path d="M117 179V138"/><ellipse cx="171" cy="169" rx="9" ry="6" transform="rotate(-22 171 169)"/><path d="M179 167V126"/><ellipse cx="235" cy="157" rx="9" ry="6" transform="rotate(-22 235 157)"/><path d="M243 155V114"/><ellipse cx="299" cy="169" rx="9" ry="6" transform="rotate(-22 299 169)"/><path d="M307 167V126"/></g>
+          <text x="350" y="48" class="art-part">VOICE</text><text x="337" y="137" class="art-part">B♭ CL.</text>
+        </svg>
+        <div class="interval-pill"><span>↑</span> One whole step. Same melody.</div>
+      </div>
+    </section>
+
+    <section class="studio" aria-label="Score conversion workspace">
+      <ol class="steps" aria-label="Conversion steps">
+        <li class="active" id="step-1" aria-current="step"><span>01</span> Upload your score</li>
+        <li id="step-2"><span>02</span> Find the melody</li>
+        <li id="step-3"><span>03</span> Review &amp; play</li>
+      </ol>
+
+      <div id="notice" class="notice" role="status" hidden></div>
+      <div id="engine-notice" class="notice warning" hidden><strong>Recognition engine needs setup.</strong> This website is running, but Audiveris is not available. Start the full app with <code>docker compose up --build</code>, or set <code>AUDIVERIS_BIN</code> as described in the README. Previewing this page alone cannot recognize a PDF.</div>
+
+      <div id="upload-stage" class="upload-layout">
+        <div class="upload-main">
+          <p class="eyebrow muted">START WITH THE SHEET MUSIC</p>
+          <h2>Let’s find your melody.</h2>
+          <p class="section-description">A clear score makes a beautiful starting point.</p>
+          <label class="drop-zone" id="drop-zone" for="pdf-input">
+            <span class="upload-icon" aria-hidden="true">↥</span>
+            <strong>Drop your music here</strong>
+            <span>or <u>browse for a PDF</u></span>
+            <small>PDF only · Up to 20 MB · 12 pages</small>
+          </label>
+          <input id="pdf-input" type="file" accept=".pdf,application/pdf" class="visually-hidden">
+          <p class="demo-line">Just exploring? <button class="link-button" id="demo-button">Try our original sample score <span aria-hidden="true">↗</span></button></p>
+          <p class="privacy-line"><span aria-hidden="true">◈</span> Your music stays on this server. No external recognition services.</p>
+        </div>
+        <aside class="upload-aside">
+          <span class="aside-number">A SMALL NOTE</span>
+          <h3>For the best<br><em>first impression.</em></h3>
+          <ul class="tips">
+            <li>Start with printed voice-and-piano sheet music.</li>
+            <li>Use a straight, clear scan—around 300 DPI is ideal.</li>
+            <li>Choose the singing line yourself after recognition.</li>
+          </ul>
+          <p>Reading music is nuanced. You’ll have a chance to check the notes before taking the stage.</p>
+        </aside>
+      </div>
+
+      <section id="processing-stage" class="processing-stage" hidden aria-labelledby="processing-title">
+        <div class="spinner" aria-hidden="true"></div>
+        <p class="eyebrow">LISTENING WITH OUR EYES</p>
+        <h2 id="processing-title">Reading your score…</h2>
+        <p id="processing-message">Audiveris is finding the staves, notes, and voices.</p>
+        <p class="muted">This may take several minutes. You can reload this tab without losing your session.</p>
+      </section>
+
+      <section id="review-stage" hidden>
+        <div class="workspace-heading">
+          <div><p class="eyebrow muted">YOUR SCORE, YOUR CHOICE</p><h2 id="workspace-title">Which part sings?</h2><p id="filename" class="section-description"></p></div>
+          <div class="session-actions"><a id="source-link" class="text-link" target="_blank" rel="noopener">Original PDF ↗</a><button id="delete-button" class="link-button danger">Delete session</button></div>
+        </div>
+        <div class="review-layout">
+          <aside class="part-sidebar">
+            <fieldset id="selection-fields">
+              <legend>Choose the vocal part</legend>
+              <label for="movement-select" class="field-label">Movement</label>
+              <select id="movement-select"></select>
+              <div id="parts" class="parts"></div>
+              <p class="small muted">Names and “possible vocal” hints come from recognition, not certainty. Preview the part and compare it with your PDF.</p>
+              <button id="preview-button" class="button secondary" disabled>Preview selected part</button>
+              <label class="confirmation"><input type="checkbox" id="confirm-part"> <span>I’ve checked this is the vocal melody, not the piano.</span></label>
+              <button id="convert-button" class="button primary" disabled>Make my clarinet part <span aria-hidden="true">→</span></button>
+            </fieldset>
+            <a id="recognized-link" class="text-link small" download>Download recognized MusicXML</a>
+            <a id="log-link" class="text-link small" download hidden>Recognition log</a>
+          </aside>
+          <div class="score-area">
+            <div class="score-toolbar">
+              <span id="preview-label">PART PREVIEW</span>
+              <div class="page-controls"><button id="previous-page" aria-label="Previous score page" disabled>←</button><span id="page-label">—</span><button id="next-page" aria-label="Next score page" disabled>→</button></div>
+            </div>
+            <div id="score-empty" class="score-empty"><span aria-hidden="true">𝄞</span><h3>A little space for your melody.</h3><p>Select a part, then preview it here.</p></div>
+            <div id="score-busy" class="score-busy" role="status" hidden><div class="spinner"></div><p>Engraving your score…</p></div>
+            <img id="score-image" class="score-image" alt="Engraved score preview" hidden>
+            <div id="output-panel" class="output-panel" hidden>
+              <p class="eyebrow">WRITTEN FOR B♭ CLARINET</p>
+              <h3>Ready for a closer look.</h3>
+              <p>Concert C becomes written D. The clarinet sounds a whole step below the notes on this page.</p>
+              <div class="download-actions"><a id="pdf-download" class="button primary" download="clarinet.pdf">Download PDF ↓</a><a id="xml-download" class="button secondary" download="clarinet.musicxml">MusicXML ↓</a></div>
+              <ul id="warnings" class="review-warnings"></ul>
+              <details class="correction-details">
+                <summary>Fix a recognition mistake</summary>
+                <p>Download MusicXML, open it in MuseScore (or another notation editor), and correct notes, rhythms, lyrics, and layout. Keep the B-flat clarinet instrument and <strong>written-pitch</strong> view. Export uncompressed <code>.musicxml</code> and import it here. It will <strong>not</strong> be transposed again.</p>
+                <label class="button secondary correction-upload" for="correction-file">Import corrected MusicXML</label>
+                <input id="correction-file" type="file" accept=".musicxml,.xml" class="visually-hidden">
+                <details><summary>Advanced: edit MusicXML directly</summary><label for="xml-editor" class="field-label">Written-pitch MusicXML</label><textarea id="xml-editor" spellcheck="false" rows="12"></textarea><button id="save-xml" class="button secondary">Apply edits &amp; refresh</button></details>
+              </details>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="failed-stage" class="failed-stage" hidden><p class="eyebrow">A PAUSE, NOT A FINALE</p><h2>We couldn’t read this score.</h2><p id="failure-message"></p><div class="download-actions"><a id="failure-log" class="button secondary" download hidden>Download recognition log</a><button class="button primary" id="retry-button">Try another PDF</button></div><p class="muted">A clearer scan can help. For difficult scores, correct the recognition in Audiveris before exporting MusicXML.</p></section>
+    </section>
+
+    <section class="how-it-works" id="how-it-works" aria-labelledby="how-title">
+      <div><p class="eyebrow muted">FROM THE PAGE TO YOUR MUSIC STAND</p><h2 id="how-title">Less arranging.<br><em>More playing.</em></h2></div>
+      <article><span class="feature-number">01 / READ</span><h3>Bring the whole score.</h3><p>Local optical music recognition reads your printed PDF into editable musical notation.</p></article>
+      <article><span class="feature-number">02 / TRANSPOSE</span><h3>Keep the singing line.</h3><p>You choose the vocal part. We leave the piano behind and write the melody for B-flat clarinet.</p></article>
+      <article><span class="feature-number">03 / MAKE IT YOURS</span><h3>Check it. Then play it.</h3><p>Review the result, fix recognition errors in your notation editor, and take a clean PDF to your next practice.</p></article>
+    </section>
+  </main>
+  <footer><a class="brand footer-brand" href="/">reed <em>&amp;</em> voice.</a><p>Made for the joy of playing.<br><span>Use scores you own or have permission to arrange.</span></p><span class="footer-note">PRIVATE BY DESIGN. HUMAN-REVIEWED BY YOU.</span></footer>
+</body>
+</html>

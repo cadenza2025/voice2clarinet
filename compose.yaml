@@ -1,0 +1,19 @@
+services:
+  web:
+    build: .
+    platform: linux/amd64
+    environment:
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - scores:/app/data
+    init: true
+    mem_limit: 6g
+    cpus: 2
+    pids_limit: 256
+    restart: unless-stopped
+    stop_grace_period: 11m
+
+volumes:
+  scores:
